@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>🎄 Christmas Hunt 2025</title>
+
+  <style>
+    :root {
+      --bg1: #0a1f16; --bg2: #0e2a1e; --panel: #113524; --option: #0f3a24; --option-hover: #13472b;
+      --border-gold: #d4af37; --text: #fdf7e3; --muted: #cbd5e1; --accent: #22c55e; --btn: #b91c1c; --btn-alt: transparent;
+      --lights-red: #ff6b6b; --lights-green: #22c55e; --lights-gold: #ffd166;
+      --radius-xl: 20px; --radius-lg: 16px; --radius-md: 12px; --gap-row: .9rem; --gap-col: .9rem; --pad-q: 1.1rem; --pad-a-y: .7rem; --pad-a-x: 1.1rem;
+    }
+    html { font-size: 16px; }
+    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; color: var(--text);
+      background: radial-gradient(1000px 500px at -10% 0%, #143322 0%, transparent 60%),
+                  radial-gradient(800px 400px at 110% 20%, #2b1a10 0%, transparent 60%),
+                  linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 50%, var(--bg1) 100%);
+      -webkit-text-size-adjust: 100%; }
+    .wrap { max-width: 960px; margin: 0 auto; padding: .75rem 1rem 5.5rem; /* extra bottom space for sticky bar */ }
+    header { text-align: center; margin-bottom: .75rem; position: relative; padding-top: 2.2rem; }
+    h1 { margin: .2rem 0; font-size: clamp(1.7rem, 4vw, 2.4rem); line-height: 1.15; text-shadow: 0 2px 6px rgba(0,0,0,0.3); }
+    .lights { position: absolute; top: 0; left: 0; width: 100%; height: 48px; overflow: hidden; }
+    .lights svg { width: 100%; height: 100%; display: block; }
+    .bulb { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4)); }
+    .glow-red{animation:glow 1.8s ease-in-out infinite;} .glow-green{animation:glow 2.1s ease-in-out infinite;} .glow-gold{animation:glow 2.4s ease-in-out infinite;}
+    @keyframes glow{0%,100%{opacity:.6;}50%{opacity:1;}} @media (prefers-reduced-motion:reduce){.glow-red,.glow-green,.glow-gold{animation:none;}}
+
+    .question{margin:1rem 0;} .q-box{background:var(--panel);border:2px solid var(--border-gold);color:var(--text);border-radius:var(--radius-xl);padding:var(--pad-q);font-weight:700;font-size:1rem;box-shadow:0 3px 10px rgba(0,0,0,0.25),inset 0 1px 0 rgba(255,255,255,0.08);display:flex;align-items:center;gap:.75rem;}
+    .q-box .holly{width:28px;height:28px;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.35));flex:0 0 auto;} .q-num{color:var(--border-gold);} 
+    .options{display:flex;flex-wrap:wrap;gap:var(--gap-row) var(--gap-col);margin-top:.9rem;align-items:center;} 
+    .option{display:inline-flex;align-items:center;gap:.6rem;padding:var(--pad-a-y) var(--pad-a-x);background:var(--option);border:2px solid var(--border-gold);color:var(--text);border-radius:var(--radius-lg);cursor:pointer;user-select:none;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.2);transition:background .15s ease, transform .05s ease, border-color .15s ease;-webkit-tap-highlight-color:transparent;} 
+    .option:hover{background:var(--option-hover);} .option:active{transform:translateY(1px);} .option input[type=radio]{accent-color:var(--accent);width:1.1rem;height:1.1rem;margin:0;} 
+
+    /* Separate sticky controls bar at bottom */
+    .controls-bar {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      padding: .75rem 1rem;
+      background: linear-gradient(180deg, rgba(17,53,36,0.85), rgba(12,36,25,0.95));
+      border-top: 2px solid var(--border-gold);
+      display: flex; gap: .7rem; justify-content: center; align-items: center; flex-wrap: wrap;
+      z-index: 1000;
+      backdrop-filter: blur(6px);
+    }
+    .btn {
+      border-radius: var(--radius-md);
+      border: 2px solid var(--border-gold);
+      padding: .75rem 1.05rem;
+      cursor: pointer;
+      color: var(--text);
+      font-weight: 800;
+      font-size: 1rem;
+      min-height: 44px;
+      touch-action: manipulation;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    }
+    #submitBtn { background: linear-gradient(180deg, #c81e1e, var(--btn)); }
+    #resetBtn  { background: linear-gradient(180deg, #18432d, #0f3524); display: none; }
+
+    .result{margin-top:.75rem;padding:.8rem 1rem;border-radius:var(--radius-md);border:2px solid var(--border-gold);background:#0b1f18;display:none;} .result.ok{display:block;border-color:#2ea44f;} .result.err{display:block;border-color:#b91c1c;} 
+    .riddle{margin-top:1rem;padding:1rem;border-radius:var(--radius-lg);border:2px solid var(--border-gold);background:linear-gradient(180deg,#10281f,#0c2119),url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><circle cx="12" cy="20" r="2" fill="%23ffffff22"/><circle cx="50" cy="8" r="1.6" fill="%23ffffff22"/><circle cx="70" cy="40" r="1.8" fill="%23ffffff22"/></svg>') repeat;display:none;} .riddle h3{margin-top:0;} .riddle pre{white-space:pre-wrap;margin:0;color:#f2f6f7;font-size:1rem;} 
+
+    @media (max-width:480px) and (orientation:portrait){:root{--gap-row:.7rem;--gap-col:.7rem;--pad-q:1rem;--pad-a-y:.65rem;--pad-a-x:.95rem;} .wrap{padding:.8rem .75rem 6.5rem;} .q-box{font-size:1rem;} .option{font-size:.98rem;}}
+    @media (max-width:820px) and (orientation:landscape){:root{--gap-row:.65rem;--gap-col:.65rem;--pad-q:.95rem;--pad-a-y:.6rem;--pad-a-x:.9rem;} .wrap{padding:.6rem .75rem 6rem;} .q-box{font-size:.96rem;} .option{font-size:.96rem;}} 
+
+    @supports (padding: env(safe-area-inset-bottom)) {
+      .controls-bar { padding-bottom: calc(.75rem + env(safe-area-inset-bottom)); }
+    }
+
+    .snow-wrap{position:fixed;inset:0;pointer-events:none;z-index:-1;} .flake{position:absolute;width:6px;height:6px;background:#ffffffcc;border-radius:50%;filter:blur(.3px);animation:fall linear infinite;} @keyframes fall{0%{transform:translateY(-5vh);opacity:0;}10%{opacity:.9;}100%{transform:translateY(105vh);opacity:.95;}} @media (prefers-reduced-motion:reduce){.flake{display:none;}}
+  </style>
+</head>
+<body>
+  <div class="snow-wrap" aria-hidden="true" id="snow"></div>
+
+  <div class="wrap">
+    <header>
+      <div class="lights" aria-hidden="true">
+        <svg viewBox="0 0 1200 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0,40 C200,80 400,0 600,60 C800,120 1000,20 1200,60" stroke="#08351f" stroke-width="6" fill="none"/>
+          <g class="bulb glow-red"><circle cx="80"  cy="46" r="10" fill="var(--lights-red)"/><rect x="74" y="34" width="12" height="8" rx="3" fill="#333"/></g>
+          <g class="bulb glow-green"><circle cx="220" cy="22" r="10" fill="var(--lights-green)"/><rect x="214" y="10" width="12" height="8" rx="3" fill="#333"/></g>
+          <g class="bulb glow-gold"><circle cx="360" cy="55" r="10" fill="var(--lights-gold)"/><rect x="354" y="43" width="12" height="8" rx="3" fill="#333"/></g>
+          <g class="bulb glow-red"><circle cx="500" cy="28" r="10" fill="var(--lights-red)"/><rect x="494" y="16" width="12" height="8" rx="3" fill="#333"/></g>
+          <g class="bulb glow-green"><circle cx="640" cy="72" r="10" fill="var(--lights-green)"/><rect x="634" y="60" width="12" height="8" rx="3" fill="#333"/></g>
+          <g class="bulb glow-gold"><circle cx="780" cy="35" r="10" fill="var(--lights-gold)"/><rect x="774" y="23" width="12" height="8" rx="3" fill="#333"/></g>
+          <g class="bulb glow-red"><circle cx="920" cy="65" r="10" fill="var(--lights-red)"/><rect x="914" y="53" width="12" height="8" rx="3" fill="#333"/></g>
+          <g class="bulb glow-green"><circle cx="1060" cy="25" r="10" fill="var(--lights-green)"/><rect x="1054" y="13" width="12" height="8" rx="3" fill="#333"/></g>
+        </svg>
+      </div>
+      <h1>🎄 Christmas Hunt 2025</h1>
+    </header>
+
+    <!-- QUIZ (fixed order; answers shuffle) -->
+    <form id="quizForm" aria-label="Christmas Hunt Quiz"></form>
+
+    <div id="result" class="result" role="status" aria-live="polite"></div>
+
+    <div id="riddle" class="riddle" aria-hidden="true">
+      <h3>🎁 Congratulations! Here’s your reward riddle:</h3>
+      <pre>
+“I stand tall but never walk;
+ I have a neck but never talk.
+ I eat no food yet burn with might,
+ And chase away the dark of night.
+ What am I?”
+      </pre>
+    </div>
+  </div>
+
+  <!-- Sticky controls bar: Submit (always visible) + Try again (only shows if <94%) -->
+  <div class="controls-bar" role="region" aria-label="Quiz controls">
+    <button type="button" id="submitBtn" class="btn">Submit Quiz</button>
+    <button type="button" id="resetBtn" class="btn">Try again</button>
+  </div>
+
+  <script>
+    // Fixed question order, correct answers spell SOAPOPERA SET TOUR
+    const QUIZ = [
+      { id: 1,  q: "Which music app introduced AI‑generated playlists in 2025?", options: ["Apple Music", "Spotify", "YouTube Music"], correct: "Spotify" },
+      { id: 2,  q: "Which film surged back on streaming charts in 2025 after its Oscar‑era success?", options: ["Barbie", "Oppenheimer", "Dune"], correct: "Oppenheimer" },
+      { id: 3,  q: "Which blockbuster franchise confirmed its third film for release in 2025?", options: ["Marvel", "Avatar", "Star Wars"], correct: "Avatar" },
+      { id: 4,  q: "Which studio released “Inside Out 2” in 2025?", options: ["DreamWorks", "Pixar", "Illumination"], correct: "Pixar" },
+      { id: 5,  q: "Which Britpop band caused mayhem announcing a reunion tour in 2025?", options: ["Oasis", "Blur", "Pulp"], correct: "Oasis" },
+      { id: 6,  q: "Which city's fashion week went viral in 2025 for AI‑designed outfits?", options: ["New York", "Paris", "Milan"], correct: "Paris" },
+      { id: 7,  q: "Which contest was hosted in Prague in 2025?", options: ["American Idol", "Eurovision", "The Voice"], correct: "Eurovision" },
+      { id: 8,  q: "Which star returned to the stage at the 2025 Grammys after years away?", options: ["Lady Gaga", "Rihanna", "Billie Eilish"], correct: "Rihanna" },
+      { id: 9,  q: "Which country’s Opera House hosted a globally streamed K‑pop concert in 2025?", options: ["Canada", "Australia", "England"], correct: "Australia" },
+      { id: 10, q: "In Disney’s sci‑fi comedy set in Hawaii, which genetically engineered experiment becomes Lilo’s unusual companion?", options: ["Shrek", "Stitch", "Simba"], correct: "Stitch" },
+      { id: 11, q: "Which long‑running British soap opera is set in the Yorkshire Dales?", options: ["Emmerdale", "EastEnders", "Endeavour"], correct: "Emmerdale" },
+      { id: 12, q: "Which Britney Spears hit single was released in 2003?", options: ["Womanizer", "Toxic", "Circus"], correct: "Toxic" },
+      { id: 13, q: "Which James Cameron film became the highest‑grossing movie in 1997?", options: ["True Lies", "Titanic", "Terminator 2"], correct: "Titanic" },
+      { id: 14, q: "Who broke out with the 2021 hit “drivers license”?", options: ["Dua Lipa", "Olivia Rodrigo", "Olivia Newton‑John"], correct: "Olivia Rodrigo" },
+      { id: 15, q: "Which Netflix series follows a dysfunctional superhero family?", options: ["Upload", "Umbrella Academy", "The Boys"], correct: "Umbrella Academy" },
+      { id: 16, q: "Who plays Deadpool in the 2016 film?", options: ["Robert Downey Jr.", "Ryan Reynolds", "Rami Malek"], correct: "Ryan Reynolds" }
+    ];
+
+    const shuffle = (arr) => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+    const formEl = document.getElementById('quizForm');
+    const resultBox = document.getElementById('result');
+    const riddleBox = document.getElementById('riddle');
+    const submitBtn = document.getElementById('submitBtn');
+    const resetBtn  = document.getElementById('resetBtn');
+
+    function renderQuiz({ shuffleOptions = true, restore = {} } = {}) {
+      formEl.innerHTML = '';
+      QUIZ.forEach((qObj, idx) => {
+        const qWrap = document.createElement('div'); qWrap.className = 'question';
+        const qBar = document.createElement('div'); qBar.className = 'q-box';
+        qBar.innerHTML = `
+          <svg class=\"holly\" viewBox=\"0 0 64 64\" xmlns=\"http://www.w3.org/2000/svg\" aria-hidden=\"true\">
+            <path d=\"M10 28 C18 24, 26 24, 34 20 C30 26, 28 30, 26 34 C22 32, 16 32, 10 28 Z\" fill=\"#0f5f2c\"/>
+            <path d=\"M18 40 C26 36, 34 34, 42 30 C38 36, 36 40, 34 44 C28 42, 22 42, 18 40 Z\" fill=\"#0f5f2c\"/>
+            <circle cx=\"28\" cy=\"28\" r=\"5\" fill=\"#b91c1c\"/>
+            <circle cx=\"36\" cy=\"26\" r=\"4\" fill=\"#b91c1c\"/>
+          </svg>
+          <span class=\"q-num\">${idx + 1})</span> ${qObj.q}`;
+        qWrap.appendChild(qBar);
+
+        const opts = document.createElement('div'); opts.className = 'options';
+        const optsList = shuffleOptions ? shuffle(qObj.options) : qObj.options.slice();
+        optsList.forEach(opt => {
+          const id = `q${qObj.id}_${opt.replace(/[^a-z0-9]+/gi,'-').toLowerCase()}`;
+          const label = document.createElement('label'); label.className = 'option'; label.setAttribute('for', id);
+          const input = document.createElement('input'); input.type = 'radio'; input.id = id; input.name = `q${qObj.id}`; input.value = opt;
+          const span = document.createElement('span'); span.textContent = opt;
+          label.appendChild(input); label.appendChild(span); opts.appendChild(label);
+        });
+        qWrap.appendChild(opts); formEl.appendChild(qWrap);
+      });
+
+      // Restore selections if provided
+      Object.entries(restore).forEach(([name, value]) => {
+        const el = formEl.querySelector(`input[name=\"${name}\"][value=\"${CSS.escape ? CSS.escape(value) : value}\"]`);
+        if (el) el.checked = true;
+      });
+
+      // Ensure controls state
+      resetBtn.style.display = 'none';
+    }
+
+    // Initial render: shuffle answers only
+    renderQuiz({ shuffleOptions: true });
+
+    // Submit evaluates, unlocks riddle, and conditionally shows Try again if <94%
+    submitBtn.addEventListener('click', () => {
+      const total = QUIZ.length;
+      let answered = 0, correct = 0;
+
+      QUIZ.forEach(q => {
+        const picked = formEl.querySelector(`input[name=\"q${q.id}\"]:checked`);
+        if (picked) {
+          answered++;
+          if (picked.value === q.correct) correct++;
+        }
+      });
+
+      if (answered < total) {
+        resultBox.textContent = `You answered ${answered}/${total}. Please answer all questions to unlock the riddle.`;
+        resultBox.className = 'result err';
+        riddleBox.style.display = 'none';
+        riddleBox.setAttribute('aria-hidden', 'true');
+        resetBtn.style.display = 'none';
+        return;
+      }
+
+      const percent = Math.round((correct / total) * 100);
+      resultBox.textContent = `Score: ${correct}/${total} (${percent}%)`;
+      resultBox.className = percent >= 94 ? 'result ok' : 'result err';
+
+      // Only unlock riddle for scores >= 94%
+      if (percent >= 94) {
+        riddleBox.style.display = 'block';
+        riddleBox.setAttribute('aria-hidden', 'false');
+        resetBtn.style.display = 'none';
+      } else {
+        riddleBox.style.display = 'none';
+        riddleBox.setAttribute('aria-hidden', 'true');
+        resetBtn.style.display = 'inline-block';
+      }
+    });
+
+    // Try again refreshes the page (hard Reset)
+    resetBtn.addEventListener('click', () => { window.location.reload(); });
+
+    // Orientation handling: preserve selections without reshuffling
+    function getSelections(){ const selections = {}; QUIZ.forEach(q => { const picked = formEl.querySelector(`input[name=\"q${q.id}\"]:checked`); if (picked) selections[`q${q.id}`] = picked.value; }); return selections; }
+    function onOrientationOrResize(){ const restore = getSelections(); renderQuiz({ shuffleOptions: false, restore }); }
+    if ('screen' in window && 'orientation' in screen) { screen.orientation.addEventListener('change', onOrientationOrResize); }
+    else { window.addEventListener('orientationchange', onOrientationOrResize); window.addEventListener('resize', () => { clearTimeout(window.__resizeT); window.__resizeT = setTimeout(onOrientationOrResize, 150); }); }
+
+    // Gentle snowfall
+    (function makeSnow(){ const container = document.getElementById('snow'); if (!container) return; const flakes = 24; const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0); for (let i=0;i<flakes;i++){ const f=document.createElement('span'); f.className='flake'; f.style.left=Math.round(Math.random()*vw)+'px'; f.style.animationDuration=(6+Math.random()*8)+'s'; f.style.animationDelay=(Math.random()*5)+'s'; f.style.opacity=(0.6+Math.random()*0.4); f.style.width=f.style.height=(4+Math.random()*3)+'px'; container.appendChild(f);} })();
+  </script>
+</body>
+</html>
